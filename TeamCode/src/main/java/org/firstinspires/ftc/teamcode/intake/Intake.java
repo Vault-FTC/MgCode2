@@ -23,6 +23,7 @@ public class Intake {
                 intakeMotor.setPower(1.0);
                 break;
             case INTAKE_OFF:
+                intakeMotor.setPower(0.0);
                 break;
             case INTAKE_OUT:
                 intakeMotor.setPower(-1.0);

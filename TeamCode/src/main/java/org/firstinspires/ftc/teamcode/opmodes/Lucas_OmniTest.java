@@ -40,6 +40,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.arm.Arm;
+import org.firstinspires.ftc.teamcode.arm.ArmPhases;
 import org.firstinspires.ftc.teamcode.arm.ArmPositions;
 import org.firstinspires.ftc.teamcode.drive.RobotMecanumDrive;
 import org.firstinspires.ftc.teamcode.droneLauncher.DroneLauncher;
@@ -97,9 +98,8 @@ public class Lucas_OmniTest extends LinearOpMode {
         DroneLauncher droneLauncher = new DroneLauncher(hardwareMap, telemetry);
         Arm arm = new Arm(hardwareMap, telemetry);
         Intake intake = new Intake(hardwareMap, telemetry);
-        ArmPositions[] armPositions = ArmPositions.BuildArmPositions();
         List<ArmPositions> armTargets = new ArrayList<>();
-        armTargets.add(new ArmPositions(0,0,0));
+        armTargets.add(new ArmPositions(0,0,0, false));
         waitForStart();
         runtime.reset();
 
@@ -115,17 +115,7 @@ public class Lucas_OmniTest extends LinearOpMode {
             } else {
                 intake.runIntake(IntakeModes.INTAKE_OFF);
             }
-            if (armTargets.size() > 0) {
-                if (arm.checkPosition(armTargets.get(0))) {
-                    armTargets.remove(0);
-                } else {
-                    arm.moveArmToPosition(armTargets.get(0)); // TODO: set arm positions
-                }
-            }
-            else {
-                arm.moveArmByGamepad(gamepad2);
-                arm.setMotors();
-            }
+
 
             droneLauncher.Launch(gamepad1.y);
 
@@ -139,5 +129,55 @@ public class Lucas_OmniTest extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
+    }
+
+    private ArmPhases doArm(Arm arm, List<ArmPositions> armTargets, ArmPhases currentPhase)
+    {
+        ArmPhases nextPhase = ArmPhases.ARM_PREPARETOPLACE_TO_READYPICKUP;
+        if(armTargets.size() < 1) {
+            if (gamepad2.dpad_up) {
+                switch(currentPhase)
+                {
+                    case ARM_INITIALIZATION:
+                        nextPhase = ArmPhases.ARM_STARTUP_TO_READYPICKUP;
+                        break;
+                    case ARM_STARTUP_TO_READYPICKUP:
+                        armTargets = ArmPositions.BuildArmStartupToReadyPickup();
+                        nextPhase = ArmPhases.ARM_READYPICKUP_TO_PICKUP;
+                        break;
+                    case ARM_READYPICKUP_TO_PICKUP:
+                        armTargets = ArmPositions.BuildReadyPickupToPickup();
+                        nextPhase = ArmPhases.ARM_PICKUP_TO_PREPARETOPLACE;
+                        break;
+                    case ARM_PICKUP_TO_PREPARETOPLACE:
+                        armTargets = ArmPositions.BuildPickupToPrepareToPlace();
+                        nextPhase = ArmPhases.ARM_PREPARETOPLACE_TO_READYPICKUP;
+                        break;
+                    case ARM_PREPARETOPLACE_TO_READYPICKUP:
+                        armTargets = ArmPositions.BuildPrepareToPlaceToReadyToPickup();
+                        nextPhase = ArmPhases.ARM_READYPICKUP_TO_PICKUP;
+                        break;
+                }
+            }
+        }
+        if(gamepad2.start)
+        {
+            armTargets.clear();
+        }
+        if (armTargets.size() > 0) {
+            if (arm.checkPosition(armTargets.get(0))) {
+                if(runtime.seconds() > 1.5) {
+                    armTargets.remove(0);
+                }
+            } else {
+                arm.moveArmToPosition(armTargets.get(0));
+                runtime.reset();
+            }
+        }
+        else {
+            arm.moveArmByGamepad(gamepad2);
+            arm.setMotors();
+        }
+        return nextPhase;
     }
 }

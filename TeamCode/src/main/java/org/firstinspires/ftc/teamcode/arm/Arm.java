@@ -66,9 +66,28 @@ public class Arm {
         targetElbowPosition = Math.min(10000, Math.max(targetElbowPosition - (10 * gamepad2.left_stick_y), -10000));
     }
 
-    public boolean checkArmPositions(ArmPositions target)
+    public boolean checkPosition(ArmPositions target)
     {
-        if()
+        // WristPosition is a servo.  Servos have a range of 0.0-1.0.
+        if(Math.abs(target.wristPosition - wristPosition) > 0.05)
+        {
+            return false;
+        }
+        // GrabberPosition is a servo.  Servos have a range of 0.0-1.0.
+        if(Math.abs(target.grabberPosition - grabberServo.getPosition()) > 0.05)
+        {
+            return false;
+        }
+        // ElbowPosition is a motor at 1:264 reduction.  Safe range is 0-3180
+        if(Math.abs(target.elbowPosition - elbowMotor.getCurrentPosition()) > 20)
+        {
+            return false;
+        }
+        if(Math.abs(target.sliderPosition - weGoUpMotor.getCurrentPosition()) > 0.10)
+        {
+            return false;
+        }
+        return true;
     }
 
     public void setMotors()
