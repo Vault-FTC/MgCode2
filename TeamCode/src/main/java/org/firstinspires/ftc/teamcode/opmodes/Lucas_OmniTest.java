@@ -34,10 +34,24 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.checkerframework.checker.units.qual.A;
+import org.firstinspires.ftc.teamcode.arm.Arm;
+import org.firstinspires.ftc.teamcode.arm.ArmPositions;
+import org.firstinspires.ftc.teamcode.drive.RobotMecanumDrive;
+import org.firstinspires.ftc.teamcode.droneLauncher.DroneLauncher;
+import org.firstinspires.ftc.teamcode.intake.Intake;
+import org.firstinspires.ftc.teamcode.intake.IntakeModes;
+
+import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.Function;
 
 /*
  * This file contains an example of a Linear "OpMode".
@@ -72,211 +86,58 @@ public class Lucas_OmniTest extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftFrontDrive = null;
-    private DcMotor leftBackDrive = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightBackDrive = null;
-
-    private DcMotor intakeMotor = null;
-
-    private DcMotorEx elbowMotor = null;
-
-    private Servo wristServo;
-    private Servo planeServo;
-
-    private double wristAccel;
 
     @Override
     public void runOpMode() {
-
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "left_front_drive");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-        intakeMotor = hardwareMap.get(DcMotor.class, "intake_motor");
-        elbowMotor = hardwareMap.get(DcMotorEx.class, "arm_motor");
-        wristServo = hardwareMap.get(Servo.class, "wrist");
-        planeServo = hardwareMap.get(Servo.class, "plane");
-        // ########################################################################################
-        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
-        // ########################################################################################
-        // Most robots need the motors on one side to be reversed to drive forward.
-        // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
-        // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
-        // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
-        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
-        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
-        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-
-        elbowMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        elbowMotor.setTargetPosition(0);
-        elbowMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        elbowMotor.setPower(1.0);
-        elbowMotor.setPositionPIDFCoefficients(0.5);
-
-        //elbowMotor.setTargetPositionTolerance();
-
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        RobotMecanumDrive drive = new RobotMecanumDrive(hardwareMap, telemetry);
+        DroneLauncher droneLauncher = new DroneLauncher(hardwareMap, telemetry);
+        Arm arm = new Arm(hardwareMap, telemetry);
+        Intake intake = new Intake(hardwareMap, telemetry);
+        ArmPositions[] armPositions = ArmPositions.BuildArmPositions();
+        List<ArmPositions> armTargets = new ArrayList<>();
+        armTargets.add(new ArmPositions(0,0,0));
         waitForStart();
         runtime.reset();
 
-        double lastYaw = 0;
-        double lastAxial = 0;
-        double lastLateral = 0;
-        double wristPosition = 0; //TODO : SET DEFAULT Position,
-        double targetElbowPosition = 0; // TODO : Set default.
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            double max;
 
             boolean fastMode = gamepad1.x;
 
+            if (gamepad1.a) {
+                intake.runIntake(IntakeModes.INTAKE_ON);
+            } else if (gamepad1.b) {
+                intake.runIntake(IntakeModes.INTAKE_OUT);
+            } else {
+                intake.runIntake(IntakeModes.INTAKE_OFF);
+            }
+            if (armTargets.size() > 0) {
+                if (arm.checkPosition(armTargets.get(0))) {
+                    armTargets.remove(0);
+                } else {
+                    arm.moveArmToPosition(armTargets.get(0)); // TODO: set arm positions
+                }
+            }
+            else {
+                arm.moveArmByGamepad(gamepad2);
+                arm.setMotors();
+            }
 
+            droneLauncher.Launch(gamepad1.y);
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral = gamepad1.left_stick_x;
             double yaw = gamepad1.right_stick_x;
-
-            if(!fastMode)
-            {
-                yaw /= 1.6;
-            }
-            else {
-                axial /= 1.8;
-                lateral /= 1.8;
-            }
-
-//            axial = applyAccelLimit(axial, lastAxial);
-//            yaw = applyAccelLimit(yaw, lastYaw);
-//            lateral = applyAccelLimit(lateral, lastLateral);
-
-            lastAxial = axial;
-            lastYaw = yaw;
-            lastLateral = lateral;
-
-            // Combine the joystick requests for each axis-motion to determine each wheel's power.
-            // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower = axial + lateral + yaw;
-            double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower = axial - lateral + yaw;
-            double rightBackPower = axial + lateral - yaw;
-
-            // Normalize the values so no wheel power exceeds 100%
-            // This ensures that the robot maintains the desired motion.
-            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-            max = Math.max(max, Math.abs(leftBackPower));
-            max = Math.max(max, Math.abs(rightBackPower));
-
-            if (max > 1.0) {
-                leftFrontPower /= max;
-                rightFrontPower /= max;
-                leftBackPower /= max;
-                rightBackPower /= max;
-            }
-/*
-            float driveSpeed = 0.5f;
-
-            if(gamepad1.y) {
-                driveSpeed = 1f;
-
-            }
-            else(
-//                    driveSpeed = 0.5f;
-)
-*/
-            if(gamepad1.a)
-            {
-                intakeMotor.setPower(1.0);
-            }
-            else if(gamepad1.b)
-            {
-                intakeMotor.setPower(-1.0);
-            }
-            else
-            {
-                intakeMotor.setPower(0);
-            }
-
-
-
-
-
-            // This is test code:
-            //
-            // Uncomment the following code to test your motor directions.
-            // Each button should make the corresponding motor run FORWARD.
-            //   1) First get all the motors to take to correct positions on the robot
-            //      by adjusting your Robot Configuration if necessary.
-            //   2) Then make sure they run in the correct direction by modifying the
-            //      the setDirection() calls above.
-            // Once the correct motors move in the correct direction re-comment this code.
-
-            /*
-            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-            leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
-            */
-
-            // Send calculated power to wheels
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
-
-            double planeMotor = 0;
-
-            if(gamepad1.y) {
-                planeMotor = 100;// measure plane moder
-            } else {
-                planeMotor = 0;
-            }
-            planeServo.setPosition(planeMotor);
-
-            wristPosition = Math.min(1.0, Math.max(wristPosition - (0.02 * gamepad2.right_stick_y), 0));
-            wristServo.setPosition(wristPosition);
-
-            double elbowPositionInUnits = elbowMotor.getCurrentPosition();
-            targetElbowPosition = Math.min(5000, Math.max(targetElbowPosition - (0.5 * gamepad2.left_stick_y), -5000));
-
-            elbowMotor.setTargetPosition((int)targetElbowPosition);
+            drive.drive(fastMode, axial, lateral, yaw);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-            telemetry.addData("Wrist", "%4.2f", wristPosition);
-            telemetry.addData("Elbow / Target Position", "%4.2f : %4.2f",  elbowPositionInUnits, targetElbowPosition);
             telemetry.update();
         }
     }
-
-    public double applyAccelLimit(double joystickSpeed, double lastSpeed)
-    {
-        double accelThreshold = 0.3;
-        double accel = 0.0001;
-        if(Math.abs(joystickSpeed) - Math.abs(lastSpeed) > accelThreshold)
-        {
-            if(joystickSpeed > 0)
-            {
-                joystickSpeed = lastSpeed + accel;
-            }
-            else {
-                joystickSpeed = lastSpeed - accel;
-            }
-        }
-        return joystickSpeed;
-    }
 }
-

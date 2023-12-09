@@ -27,6 +27,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
@@ -53,7 +54,7 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
-public class SampleMecanumDrive extends MecanumDrive {
+public class RobotMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
 
@@ -79,8 +80,16 @@ public class SampleMecanumDrive extends MecanumDrive {
     private List<Integer> lastEncPositions = new ArrayList<>();
     private List<Integer> lastEncVels = new ArrayList<>();
 
-    public SampleMecanumDrive(HardwareMap hardwareMap) {
+    double lastYaw = 0;
+    double lastAxial = 0;
+    double lastLateral = 0;
+
+    Telemetry telemetry;
+
+    public RobotMecanumDrive(HardwareMap hardwareMap, Telemetry tele) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
+        telemetry = tele;
+
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
@@ -99,10 +108,15 @@ public class SampleMecanumDrive extends MecanumDrive {
                 DriveConstants.LOGO_FACING_DIR, DriveConstants.USB_FACING_DIR));
         imu.initialize(parameters);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftFront  = hardwareMap.get(DcMotorEx.class, "left_front_drive");
+        leftRear  = hardwareMap.get(DcMotorEx.class, "left_back_drive");
+        rightFront = hardwareMap.get(DcMotorEx.class, "right_front_drive");
+        rightRear = hardwareMap.get(DcMotorEx.class, "right_back_drive");
+
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftRear.setDirection(DcMotor.Direction.REVERSE);
+        rightFront.setDirection(DcMotor.Direction.FORWARD);
+        rightRear.setDirection(DcMotor.Direction.FORWARD);
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -278,6 +292,68 @@ public class SampleMecanumDrive extends MecanumDrive {
             wheelVelocities.add(encoderTicksToInches(vel));
         }
         return wheelVelocities;
+    }
+
+    public void drive(boolean fastMode, double axial, double lateral, double yaw)
+    {
+        double max;
+        // Combine the joystick requests for each axis-motion to determine each wheel's power.
+        // Set up a variable for each drive wheel to save the power level for telemetry.
+        double leftFrontPower = axial + lateral + yaw;
+        double rightFrontPower = axial - lateral - yaw;
+        double leftBackPower = axial - lateral + yaw;
+        double rightBackPower = axial + lateral - yaw;
+
+        // Normalize the values so no wheel power exceeds 100%
+        // This ensures that the robot maintains the desired motion.
+        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        if(!fastMode)
+        {
+            yaw /= 1.6;
+        }
+        else {
+            axial /= 1.8;
+            lateral /= 1.8;
+        }
+
+        axial = applyAccelLimit(axial, lastAxial);
+        yaw = applyAccelLimit(yaw, lastYaw);
+        lateral = applyAccelLimit(lateral, lastLateral);
+
+        lastAxial = axial;
+        lastYaw = yaw;
+        lastLateral = lateral;
+
+        setMotorPowers(leftFrontPower, leftBackPower, rightBackPower, rightFrontPower);
+        telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
+        telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+    }
+
+    public double applyAccelLimit(double joystickSpeed, double lastSpeed)
+    {
+        double accelThreshold = 0.3;
+        double accel = 0.0001;
+        if(Math.abs(joystickSpeed) - Math.abs(lastSpeed) > accelThreshold)
+        {
+            if(joystickSpeed > 0)
+            {
+                joystickSpeed = lastSpeed + accel;
+            }
+            else {
+                joystickSpeed = lastSpeed - accel;
+            }
+        }
+        return joystickSpeed;
     }
 
     @Override
