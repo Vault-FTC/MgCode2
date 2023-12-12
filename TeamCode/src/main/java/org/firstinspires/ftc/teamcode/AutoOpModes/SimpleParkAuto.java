@@ -55,19 +55,25 @@ public class SimpleParkAuto extends LinearOpMode {
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
 
-        Trajectory trajectoryForward = drive.trajectoryBuilder(new Pose2d())
+        Trajectory trajectoryForwardOne = drive.trajectoryBuilder(new Pose2d())
+                .forward(DISTANCE)
+                .build();
+
+        Trajectory trajectoryForwardTwo = drive.trajectoryBuilder(new Pose2d())
                 .forward(DISTANCE)
                 .build();
 
         Boolean getBlue = (boolean) SimpleOpenCVColorOpMode.getBlue;
 
         if (getBlue = true){
-        drive.followTrajectory(trajectoryForward);
+        drive.followTrajectory(trajectoryForwardOne);
         }
 
             Boolean getRed = (boolean) SimpleOpenCVColorOpMode.getRed;
 
-        if (getRed = true){}
+        if (getRed = true){
+            drive.followTrajectory((trajectoryForwardOne));
+        }
 
 
 
