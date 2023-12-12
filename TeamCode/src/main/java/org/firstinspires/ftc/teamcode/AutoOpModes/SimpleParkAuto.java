@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode.AutoOpModes;
 
-import org.firstinspires.ftc.teamcode.AutoOpModes.SimpleOpenCVColorOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import org.firstinspires.ftc.teamcode.drive.RobotMecanumDrive;
@@ -21,6 +19,8 @@ public class SimpleParkAuto extends LinearOpMode {
 
     RobotMecanumDrive drive = new RobotMecanumDrive(hardwareMap, telemetry);
     public static double DISTANCE = 50;
+    public static double ANGLE1 = 90;
+    public static double ANGEL2 = -90;
     /*
         private Encoder left = null;
 
@@ -63,16 +63,22 @@ public class SimpleParkAuto extends LinearOpMode {
                 .forward(DISTANCE)
                 .build();
 
+        Trajectory trajectoryTurnOne = drive.trajectoryBuilder(new Pose2d())
+                .forward(DISTANCE)
+                .build();
+
         Boolean getBlue = (boolean) SimpleOpenCVColorOpMode.getBlue;
 
         if (getBlue = true){
         drive.followTrajectory(trajectoryForwardOne);
+        drive.turn(Math.toRadians(ANGEL2));
         }
 
             Boolean getRed = (boolean) SimpleOpenCVColorOpMode.getRed;
 
         if (getRed = true){
             drive.followTrajectory((trajectoryForwardOne));
+            drive.turn(Math.toRadians(ANGLE1));
         }
 
 
