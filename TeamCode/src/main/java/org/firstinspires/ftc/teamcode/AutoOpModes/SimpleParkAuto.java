@@ -32,7 +32,6 @@ public class SimpleParkAuto extends LinearOpMode {
     public void runOpMode() {
 
 
-
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
         leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
@@ -55,47 +54,23 @@ public class SimpleParkAuto extends LinearOpMode {
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
 
-        Trajectory trajectoryForwardOne = drive.trajectoryBuilder(new Pose2d())
-                .forward(DISTANCE)
-                .build();
-
-        Trajectory trajectoryForwardTwo = drive.trajectoryBuilder(new Pose2d())
-                .forward(DISTANCE)
-                .build();
-
-        Trajectory trajectoryTurnOne = drive.trajectoryBuilder(new Pose2d())
+        Trajectory trajectoryForward = drive.trajectoryBuilder(new Pose2d())
                 .forward(DISTANCE)
                 .build();
 
         Boolean getBlue = (boolean) SimpleOpenCVColorOpMode.getBlue;
+        Boolean getRed = (boolean) SimpleOpenCVColorOpMode.getRed;
 
-        if (getBlue = true){
-        drive.followTrajectory(trajectoryForwardOne);
-        drive.turn(Math.toRadians(ANGEL2));
+        if (getBlue = true) {
+            drive.followTrajectory(trajectoryForward);
+            drive.turn(Math.toRadians(ANGEL2));
+            drive.followTrajectory(trajectoryForward);
         }
-
-            Boolean getRed = (boolean) SimpleOpenCVColorOpMode.getRed;
-
-        if (getRed = true){
-            drive.followTrajectory((trajectoryForwardOne));
+        if (getRed = true) {
+            drive.followTrajectory(trajectoryForward);
             drive.turn(Math.toRadians(ANGLE1));
+            drive.followTrajectory(trajectoryForward);
         }
 
-
-
-
-        //============================== test
-//        leftFrontDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        leftBackDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        rightFrontDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        rightBackDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        //================================
-
-        // Wait for the game to start (driver presses PLAY)
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
-        waitForStart();
-        runtime.reset();
     }
 }

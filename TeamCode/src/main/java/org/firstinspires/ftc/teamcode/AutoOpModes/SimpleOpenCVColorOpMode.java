@@ -111,7 +111,7 @@ public class SimpleOpenCVColorOpMode extends OpMode {
 
     }
     public boolean getBlue() {return Blue;}
-    }
+
     public boolean getRed() {return Red;}
 }
     
