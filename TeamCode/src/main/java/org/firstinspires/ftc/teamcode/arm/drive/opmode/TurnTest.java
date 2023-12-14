@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.drive.opmode;
+package org.firstinspires.ftc.teamcode.arm.drive.opmode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.drive.RobotMecanumDrive;
+import org.firstinspires.ftc.teamcode.arm.drive.RobotMecanumDrive;
 
 /*
  * This is a simple routine to test turning capabilities.

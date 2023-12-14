@@ -29,30 +29,20 @@
 
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import com.acmerobotics.roadrunner.control.PIDFController;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.arm.Arm;
 import org.firstinspires.ftc.teamcode.arm.ArmPhases;
 import org.firstinspires.ftc.teamcode.arm.ArmPositions;
-import org.firstinspires.ftc.teamcode.drive.RobotMecanumDrive;
+import org.firstinspires.ftc.teamcode.arm.drive.RobotMecanumDrive;
 import org.firstinspires.ftc.teamcode.droneLauncher.DroneLauncher;
 import org.firstinspires.ftc.teamcode.intake.Intake;
 import org.firstinspires.ftc.teamcode.intake.IntakeModes;
 
-import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.Function;
 
 /*
  * This file contains an example of a Linear "OpMode".
@@ -98,24 +88,36 @@ public class Lucas_OmniTest extends LinearOpMode {
         DroneLauncher droneLauncher = new DroneLauncher(hardwareMap, telemetry);
         Arm arm = new Arm(hardwareMap, telemetry);
         Intake intake = new Intake(hardwareMap, telemetry);
-        List<ArmPositions> armTargets = new ArrayList<>();
-        armTargets.add(new ArmPositions(0,0,0, false));
+        LinkedList<ArmPositions> armTargets = new LinkedList<>();
         waitForStart();
         runtime.reset();
 
+        ArmPhases armPhase = ArmPhases.ARM_INITIALIZATION;
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
             boolean fastMode = gamepad1.x;
 
             if (gamepad1.a) {
-                intake.runIntake(IntakeModes.INTAKE_ON);
+                intake.changeIntake(IntakeModes.INTAKE_ON);
             } else if (gamepad1.b) {
-                intake.runIntake(IntakeModes.INTAKE_OUT);
+                intake.changeIntake(IntakeModes.INTAKE_OUT);
             } else {
-                intake.runIntake(IntakeModes.INTAKE_OFF);
+                intake.changeIntake(IntakeModes.INTAKE_OFF);
+            }
+            intake.runIntake();
+
+            if(gamepad2.dpad_down)
+            {
+                arm.initializeArm(runtime);
             }
 
+            if(gamepad2.dpad_up)
+            {
+                armPhase = arm.addNextArmTargets(armTargets, armPhase);
+            }
+
+            arm.doArm(gamepad2, armTargets, runtime);
 
             droneLauncher.Launch(gamepad1.y);
 
@@ -125,59 +127,10 @@ public class Lucas_OmniTest extends LinearOpMode {
             double yaw = gamepad1.right_stick_x;
             drive.drive(fastMode, axial, lateral, yaw);
 
+            telemetry.addData("Arm Phase ", armPhase);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
-    }
-
-    private ArmPhases doArm(Arm arm, List<ArmPositions> armTargets, ArmPhases currentPhase)
-    {
-        ArmPhases nextPhase = ArmPhases.ARM_PREPARETOPLACE_TO_READYPICKUP;
-        if(armTargets.size() < 1) {
-            if (gamepad2.dpad_up) {
-                switch(currentPhase)
-                {
-                    case ARM_INITIALIZATION:
-                        nextPhase = ArmPhases.ARM_STARTUP_TO_READYPICKUP;
-                        break;
-                    case ARM_STARTUP_TO_READYPICKUP:
-                        armTargets = ArmPositions.BuildArmStartupToReadyPickup();
-                        nextPhase = ArmPhases.ARM_READYPICKUP_TO_PICKUP;
-                        break;
-                    case ARM_READYPICKUP_TO_PICKUP:
-                        armTargets = ArmPositions.BuildReadyPickupToPickup();
-                        nextPhase = ArmPhases.ARM_PICKUP_TO_PREPARETOPLACE;
-                        break;
-                    case ARM_PICKUP_TO_PREPARETOPLACE:
-                        armTargets = ArmPositions.BuildPickupToPrepareToPlace();
-                        nextPhase = ArmPhases.ARM_PREPARETOPLACE_TO_READYPICKUP;
-                        break;
-                    case ARM_PREPARETOPLACE_TO_READYPICKUP:
-                        armTargets = ArmPositions.BuildPrepareToPlaceToReadyToPickup();
-                        nextPhase = ArmPhases.ARM_READYPICKUP_TO_PICKUP;
-                        break;
-                }
-            }
-        }
-        if(gamepad2.start)
-        {
-            armTargets.clear();
-        }
-        if (armTargets.size() > 0) {
-            if (arm.checkPosition(armTargets.get(0))) {
-                if(runtime.seconds() > 1.5) {
-                    armTargets.remove(0);
-                }
-            } else {
-                arm.moveArmToPosition(armTargets.get(0));
-                runtime.reset();
-            }
-        }
-        else {
-            arm.moveArmByGamepad(gamepad2);
-            arm.setMotors();
-        }
-        return nextPhase;
     }
 }
