@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.arm.drive;
+package org.firstinspires.ftc.teamcode.drive;
 
 import androidx.annotation.NonNull;
 
@@ -38,25 +38,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.firstinspires.ftc.teamcode.arm.drive.DriveConstants.MAX_ACCEL;
-import static org.firstinspires.ftc.teamcode.arm.drive.DriveConstants.MAX_ANG_ACCEL;
-import static org.firstinspires.ftc.teamcode.arm.drive.DriveConstants.MAX_ANG_VEL;
-import static org.firstinspires.ftc.teamcode.arm.drive.DriveConstants.MAX_VEL;
-import static org.firstinspires.ftc.teamcode.arm.drive.DriveConstants.MOTOR_VELO_PID;
-import static org.firstinspires.ftc.teamcode.arm.drive.DriveConstants.RUN_USING_ENCODER;
-import static org.firstinspires.ftc.teamcode.arm.drive.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.arm.drive.DriveConstants.encoderTicksToInches;
-import static org.firstinspires.ftc.teamcode.arm.drive.DriveConstants.kA;
-import static org.firstinspires.ftc.teamcode.arm.drive.DriveConstants.kStatic;
-import static org.firstinspires.ftc.teamcode.arm.drive.DriveConstants.kV;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_ACCEL;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_VEL;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.encoderTicksToInches;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
 public class RobotMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.1, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0.8, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -104,8 +104,10 @@ public class RobotMecanumDrive extends MecanumDrive {
 
         // TODO: adjust the names of the following hardware devices to match your configuration
         imu = hardwareMap.get(IMU.class, "imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                DriveConstants.LOGO_FACING_DIR, DriveConstants.USB_FACING_DIR));
+        RevHubOrientationOnRobot imuDir = new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP);
+        IMU.Parameters parameters = new IMU.Parameters(imuDir);
         imu.initialize(parameters);
 
         leftFront  = hardwareMap.get(DcMotorEx.class, "left_front_drive");

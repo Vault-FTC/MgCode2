@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.AutoOpModes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -13,30 +13,35 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-@Autonomous(name="SimpleOpenCVOpMode")
-public class SimpleOpenCVColorOpMode extends OpMode {
+public class SimpleOpenCVColor {
+
     //Resolution
     static final int STREAM_WIDTH = 1280; // modify for your camera
     static final int STREAM_HEIGHT = 720; // modify for your camera
-    public static Object getBlue;
-    public static Object getRed;
     OpenCvWebcam webcam;
     SimpleOpenCVColorPipeline pipeline;
 
     
-    private Boolean Blue = null;
+    private boolean Blue = false;
 
-    private Boolean Red = null;
+    private boolean Red = false;
+
+    private HardwareMap hardwareMap;
+
+    private Telemetry telemetry;
 
 
+    public SimpleOpenCVColor(HardwareMap map, Telemetry tele)
+    {
+      hardwareMap = map;
+      telemetry = tele;
+    }
 
     private void getClass(Boolean blue) {
     }
 
-    @Override
     public void init() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         WebcamName webcamName = null;
@@ -59,7 +64,6 @@ public class SimpleOpenCVColorOpMode extends OpMode {
             }
         });
     }
-    @Override
     public void loop() {
 
 //      Create booleans Red and Blue
@@ -83,9 +87,6 @@ public class SimpleOpenCVColorOpMode extends OpMode {
                 Blue = true;
             }
         }
-
-        
-        
         
 //      If blue-difference > 130 and red-difference < 130: Red = true
         if(CbAnalysis < 130)

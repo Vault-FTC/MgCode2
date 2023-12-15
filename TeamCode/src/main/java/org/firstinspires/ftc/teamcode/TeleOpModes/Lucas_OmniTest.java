@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.TeleOpModes;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -37,7 +37,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.arm.Arm;
 import org.firstinspires.ftc.teamcode.arm.ArmPhases;
 import org.firstinspires.ftc.teamcode.arm.ArmPositions;
-import org.firstinspires.ftc.teamcode.arm.drive.RobotMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.RobotMecanumDrive;
 import org.firstinspires.ftc.teamcode.droneLauncher.DroneLauncher;
 import org.firstinspires.ftc.teamcode.intake.Intake;
 import org.firstinspires.ftc.teamcode.intake.IntakeModes;

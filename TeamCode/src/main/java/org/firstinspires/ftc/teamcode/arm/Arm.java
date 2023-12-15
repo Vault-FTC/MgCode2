@@ -70,6 +70,7 @@ public class Arm {
         }
         if(lastNewTimer == 0)
         {
+            runtime.reset();
             lastNewTimer = runtime.seconds();
             elbowMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             elbowMotor.setPower(-0.3);
