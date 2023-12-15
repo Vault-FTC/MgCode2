@@ -20,6 +20,8 @@ public class SimpleParkAuto extends LinearOpMode {
     public static double DISTANCE = 3;
     public static double ANGLE1 = -90;
     public static double ANGEL2 = 90;
+    Boolean Blue = null;
+    Boolean Red = null;
     /*
         private Encoder left = null;
 
@@ -78,15 +80,18 @@ public class SimpleParkAuto extends LinearOpMode {
             colorDetector.loop();
             boolean getBlue = colorDetector.getBlue();
             boolean getRed = colorDetector.getRed();
+            Blue = getBlue;
+            Red = getRed;
+
 
             if(!hasRunMovement) {
-                if (getBlue == true) {
+                if (Blue == true) {
                     drive.followTrajectory(trajectoryForward1A);
                     drive.turn(Math.toRadians(ANGEL2));
                     drive.followTrajectory(trajectoryForward1B);
                     hasRunMovement = true;
                 }
-                if (getRed == true) {
+                if (Red == true) {
                     drive.followTrajectory(trajectoryForward2A);
                     drive.turn(Math.toRadians(ANGLE1));
                     drive.followTrajectory(trajectoryForward2B);
