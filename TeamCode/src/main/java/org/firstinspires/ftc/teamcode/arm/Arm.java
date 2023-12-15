@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.arm;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -51,6 +52,7 @@ public class Arm {
 
         limitSwitch = hardwareMap.get(DigitalChannel.class, "arm_limit");
 
+        elbowMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         elbowMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elbowMotor.setTargetPosition(0);
         elbowMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -75,7 +77,7 @@ public class Arm {
             elbowMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             elbowMotor.setPower(-0.3);
         }
-        if(Math.abs(lastNewTimer - runtime.seconds()) > 10)
+        if(Math.abs( runtime.seconds() - lastNewTimer) > 10)
         {
             isInitialized = true;
             elbowMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -86,6 +88,7 @@ public class Arm {
             targetElbowPosition = elbowMotor.getCurrentPosition();
             return;
         }
+        telemetry.addData("IsInitializing = ", true);
         if(limitSwitch.getState())
         {
             isInitialized = true;

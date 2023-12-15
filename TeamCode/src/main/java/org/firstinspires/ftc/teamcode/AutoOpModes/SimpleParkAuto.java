@@ -57,7 +57,19 @@ public class SimpleParkAuto extends LinearOpMode {
 //        leftBackDrive.setPower(leftBackPower);
 //        rightBackDrive.setPower(rightBackPower);
 
-        Trajectory trajectoryForward = drive.trajectoryBuilder(new Pose2d())
+        Trajectory trajectoryForward1A = drive.trajectoryBuilder(new Pose2d())
+                .forward(DISTANCE)
+                .build();
+        waitForStart();
+        Trajectory trajectoryForward1B = drive.trajectoryBuilder(new Pose2d())
+                .forward(DISTANCE)
+                .build();
+        waitForStart();
+        Trajectory trajectoryForward2A = drive.trajectoryBuilder(new Pose2d())
+                .forward(DISTANCE)
+                .build();
+        waitForStart();
+        Trajectory trajectoryForward2B = drive.trajectoryBuilder(new Pose2d())
                 .forward(DISTANCE)
                 .build();
         waitForStart();
@@ -69,15 +81,15 @@ public class SimpleParkAuto extends LinearOpMode {
 
             if(!hasRunMovement) {
                 if (getBlue == true) {
-                    drive.followTrajectory(trajectoryForward);
+                    drive.followTrajectory(trajectoryForward1A);
                     drive.turn(Math.toRadians(ANGEL2));
-                    drive.followTrajectory(trajectoryForward);
+                    drive.followTrajectory(trajectoryForward1B);
                     hasRunMovement = true;
                 }
                 if (getRed == true) {
-                    drive.followTrajectory(trajectoryForward);
+                    drive.followTrajectory(trajectoryForward2A);
                     drive.turn(Math.toRadians(ANGLE1));
-                    drive.followTrajectory(trajectoryForward);
+                    drive.followTrajectory(trajectoryForward2B);
                     hasRunMovement = true;
                 }
             }
