@@ -98,6 +98,7 @@ public class Arm {
         telemetry.addData("IsInitialized : ", isInitialized);
     }
 
+
     public void moveArmToPosition(ArmPositions armGoals)
     {
         wristPosition = armGoals.wristPosition;
