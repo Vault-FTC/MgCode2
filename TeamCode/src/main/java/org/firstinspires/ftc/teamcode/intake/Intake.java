@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.intake;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.control.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,19 +10,24 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.AutoOpModes.SimpleOpenCVColor;
 
 public class Intake {
     private DcMotorEx intakeMotor = null;
-    private DcMotor intakeSpinner = null;
+    public DcMotor intakeSpinner = null;
 
     private final int INTAKE_COUNTS_PER_ROTATION = 288;
 
     int currentTargetPosition = 0;
 
+
+
     IntakeModes currentMode = IntakeModes.INTAKE_OFF;
     IntakeModes lastMode = IntakeModes.INTAKE_OFF;
 
     Telemetry telemetry;
+
+
     public Intake(HardwareMap hardwareMap, Telemetry tele)
     {
         telemetry = tele;

@@ -1,11 +1,18 @@
 package org.firstinspires.ftc.teamcode.AutoOpModes;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import org.firstinspires.ftc.teamcode.drive.RobotMecanumDrive;
+import org.firstinspires.ftc.teamcode.intake.Intake;
 
 
 @Autonomous(name="SimpleParkAuto")
@@ -18,6 +25,7 @@ public class SimpleParkAuto extends LinearOpMode {
 
     RobotMecanumDrive drive;
     public static double DISTANCE = 3;
+    public static double INTAKEDISTANCE = -8;
     public static double ANGLE1 = -90;
     public static double ANGEL2 = 90;
     Boolean Blue = null;
@@ -30,12 +38,17 @@ public class SimpleParkAuto extends LinearOpMode {
         private Encoder back = null;
         */
 
+
     boolean hasRunMovement = false;
+
+
     @Override
     public void runOpMode() {
         drive = new RobotMecanumDrive(hardwareMap, telemetry);
         SimpleOpenCVColor colorDetector = new SimpleOpenCVColor(hardwareMap, telemetry);
         colorDetector.init();
+
+        Intake IntakeSpinner = new Intake(hardwareMap, telemetry);
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
@@ -80,6 +93,12 @@ public class SimpleParkAuto extends LinearOpMode {
             colorDetector.loop();
             boolean getBlue = colorDetector.getBlue();
             boolean getRed = colorDetector.getRed();
+            DcMotor Intake = IntakeSpinner.intakeSpinner;
+            Intake.setDirection(DcMotor.Direction.REVERSE);
+            Intake.setPower(1);
+            Intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            
+
             Blue = getBlue;
             Red = getRed;
 
