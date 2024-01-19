@@ -34,6 +34,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.LinearSlidw.LinearSlide;
+import org.firstinspires.ftc.teamcode.LinearSlidw.LinearSlideModes;
 import org.firstinspires.ftc.teamcode.arm.Arm;
 import org.firstinspires.ftc.teamcode.arm.ArmPhases;
 import org.firstinspires.ftc.teamcode.arm.ArmPositions;
@@ -88,6 +90,7 @@ public class Lucas_OmniTest extends LinearOpMode {
         DroneLauncher droneLauncher = new DroneLauncher(hardwareMap, telemetry);
         Arm arm = new Arm(hardwareMap, telemetry);
         Intake intake = new Intake(hardwareMap, telemetry);
+        LinearSlide linearSlide = new LinearSlide(hardwareMap);
         LinkedList<ArmPositions> armTargets = new LinkedList<>();
         waitForStart();
         runtime.reset();
@@ -98,6 +101,8 @@ public class Lucas_OmniTest extends LinearOpMode {
 
             boolean fastMode = gamepad1.x;
 
+            intake.setIntakeCorrectly();
+
             if (gamepad1.a) {
                 intake.changeIntake(IntakeModes.INTAKE_ON);
             } else if (gamepad1.b) {
@@ -106,6 +111,18 @@ public class Lucas_OmniTest extends LinearOpMode {
                 intake.changeIntake(IntakeModes.INTAKE_OFF);
             }
             intake.runIntake();
+
+            if (gamepad2.dpad_left) {
+                linearSlide.RunSlideMode(LinearSlideModes.SLIDE_UP);
+            } else if (gamepad2.dpad_right) {
+                linearSlide.RunSlideMode(LinearSlideModes.SLIDE_DOWN);
+            } else {
+                linearSlide.RunSlideMode(LinearSlideModes.SLIDE_OFF);
+            }
+            intake.runIntake();
+
+
+
 
             if(gamepad2.dpad_down)
             {
@@ -128,6 +145,7 @@ public class Lucas_OmniTest extends LinearOpMode {
             drive.drive(fastMode, axial, lateral, yaw);
 
             telemetry.addData("Arm Phase ", armPhase);
+            telemetry.addData("Intake_position ", intake.intake_start);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();

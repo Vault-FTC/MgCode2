@@ -34,11 +34,12 @@ public class Arm {
 
     private final double ARM_ELBOW_HIGH_SPEED = 3;
 
-    private final double ARM_MIN_POSITION = -300;
+    private final double ARM_MIN_POSITION = -6000;
 
     private final double ARM_MAX_POSITION = 3028;
 
     private boolean isInitialized = false;
+
 
     Telemetry telemetry;
 
@@ -49,6 +50,7 @@ public class Arm {
         wristServo = hardwareMap.get(Servo.class, "wrist");
         grabberServo = hardwareMap.get(Servo.class, "grabber");
         //weGoUpMotor = hardwareMap.get(DcMotorEx.class, "extend");
+        //wristServo.getController().pwmDisable();
 
         limitSwitch = hardwareMap.get(DigitalChannel.class, "arm_limit");
 

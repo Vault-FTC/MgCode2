@@ -20,7 +20,7 @@ public class Intake {
 
     int currentTargetPosition = 0;
 
-
+    public boolean intake_start = true;
 
     IntakeModes currentMode = IntakeModes.INTAKE_OFF;
     IntakeModes lastMode = IntakeModes.INTAKE_OFF;
@@ -38,26 +38,41 @@ public class Intake {
         intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         intakeMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(50, 0, 0.1,0));
         intakeMotor.setPower(1);
+        currentTargetPosition = INTAKE_COUNTS_PER_ROTATION / 3;
+        intake_start = true;
+        intakeMotor.setTargetPosition(currentTargetPosition);
+    }
+    public void setIntakeCorrectly()
+    {
+        if(intake_start == true) {
+            if(Math.abs(currentTargetPosition - intakeMotor.getCurrentPosition()) < 25) {
+                intakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                intake_start = false;
+            } else {
+                intakeMotor.setTargetPosition(currentTargetPosition);
+            }
+        }
     }
 
     public void changeIntake(IntakeModes mode)
     {
         currentMode = mode;
-        telemetry.addData("Intake: ", Math.abs(currentTargetPosition - intakeMotor.getCurrentPosition()));
-        if(Math.abs(currentTargetPosition - intakeMotor.getCurrentPosition()) < 40) {
-            switch (currentMode) {
-                case INTAKE_ON:
-                    currentTargetPosition = currentTargetPosition - (INTAKE_COUNTS_PER_ROTATION);
-                    intakeMotor.setTargetPosition(currentTargetPosition);
-                    break;
-                case INTAKE_OFF:
-                    break;
-                case INTAKE_OUT:
-                    currentTargetPosition = currentTargetPosition + (INTAKE_COUNTS_PER_ROTATION);
-                    intakeMotor.setTargetPosition(currentTargetPosition);
-                    break;
+        telemetry.addData("Intake: ", Math.abs(intakeMotor.getCurrentPosition()));
+         if(Math.abs(currentTargetPosition - intakeMotor.getCurrentPosition()) < 25) {
+                switch (currentMode) {
+                    case INTAKE_ON:
+                        currentTargetPosition = currentTargetPosition - (INTAKE_COUNTS_PER_ROTATION);
+                        intakeMotor.setTargetPosition(currentTargetPosition);
+                        break;
+                    case INTAKE_OFF:
+                        break;
+                    case INTAKE_OUT:
+                        currentTargetPosition = currentTargetPosition + (INTAKE_COUNTS_PER_ROTATION);
+                        intakeMotor.setTargetPosition(currentTargetPosition);
+                        break;
+                }
             }
-        }
     }
 
     public void runIntake()
@@ -65,7 +80,7 @@ public class Intake {
         if(lastMode != currentMode) {
             switch (currentMode) {
                 case INTAKE_ON:
-                    intakeMotor.setPower(-1.0);
+                    intakeSpinner.setPower(-1.0);
                     break;
                 case INTAKE_OUT:
                     intakeSpinner.setPower(1.0);
