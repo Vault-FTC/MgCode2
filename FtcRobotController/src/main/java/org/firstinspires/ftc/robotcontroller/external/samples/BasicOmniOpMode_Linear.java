@@ -111,16 +111,16 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral = gamepad1.left_stick_x;
-            double yaw = gamepad1.right_stick_x;
+            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double lateral =  gamepad1.left_stick_x;
+            double yaw     =  gamepad1.right_stick_x;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower = axial + lateral + yaw;
+            double leftFrontPower  = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower = axial - lateral + yaw;
-            double rightBackPower = axial + lateral - yaw;
+            double leftBackPower   = axial - lateral + yaw;
+            double rightBackPower  = axial + lateral - yaw;
 
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
@@ -129,10 +129,10 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             max = Math.max(max, Math.abs(rightBackPower));
 
             if (max > 1.0) {
-                leftFrontPower /= max;
+                leftFrontPower  /= max;
                 rightFrontPower /= max;
-                leftBackPower /= max;
-                rightBackPower /= max;
+                leftBackPower   /= max;
+                rightBackPower  /= max;
             }
 
             // This is test code:
@@ -163,72 +163,5 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.update();
-
-//            leftFrontDrive.setPower(1);
-//            leftBackDrive.setPower(1);
-//            rightFrontDrive.setPower(1);
-//            rightBackDrive.setPower(1);
-//
-//            leftFrontDrive.setPower(0);
-//            leftBackDrive.setPower(0);
-//            rightFrontDrive.setPower(0);
-//            rightBackDrive.setPower(0);
-//            public void Forward(double power, long millis) {
-//
-//                power = 1;
-//
-//                millis = 1000;
-//
-//                leftFrontDrive.setPower(power);
-//                leftBackDrive.setPower(power);
-//                rightFrontDrive.setPower(-power);
-//                rightBackDrive.setPower(-power);
-//
-//                sleep(millis);
-//
-//                leftFrontDrive.setPower(0);
-//                leftBackDrive.setPower(0);
-//                rightFrontDrive.setPower(0);
-//                rightBackDrive.setPower(0);
-
-/*
-new TrajectoryBuilder(new Pose2d())
-        .forward(24)
-        .strafeRight(75)
-        .forward(90)
-        //grab
-        .back(90)
-        .strafeLeft(117)
-        //turn
-        //place
-        //turn back
-        .strafeRight(75)
-        .forward(90)
-        //grab
-        .back(90)
-        .strafeLeft(117)
-        //turn
-        //place
-
-*/
-//drive thing ↓
-
-
-//            leftFrontDrive.setPower(1);
-//            leftBackDrive.setPower(1);
-//            rightFrontDrive.setPower(1);
-//            rightBackDrive.setPower(1);
-//
-//sleep(1000);
-//
-//            leftFrontDrive.setPower(0);
-//            leftBackDrive.setPower(0);
-//            rightFrontDrive.setPower(0);
-//            rightBackDrive.setPower(0);
-
         }
-        }
-
-
-    }
-
+    }}
