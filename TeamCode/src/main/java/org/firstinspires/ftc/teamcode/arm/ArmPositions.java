@@ -9,21 +9,12 @@ public class ArmPositions {
     public double wristPosition;
     public double elbowPosition;
     public double sliderPosition;
-    public double grabberPosition;
 
-    public ArmPositions(double slider, double elbow, double wrist, boolean grabbing)
+    public ArmPositions(double slider, double elbow, double wrist)
     {
         wristPosition = wrist;
         elbowPosition = elbow;
         sliderPosition = slider;
-        if(grabbing)
-        {
-            grabberPosition = 1.0;
-        }
-        else
-        {
-            grabberPosition = 0.0;
-        }
     }
 
 //    public static ArmPositions[] BuildArmPositions()
@@ -37,27 +28,27 @@ public class ArmPositions {
 
     public static void BuildArmStartupToReadyPickup(List<ArmPositions> list)
     {
-        list.add(new ArmPositions(0, 0, 0, false)); //Starting pos.
-        list.add(new ArmPositions(0, 830, 0, false)); // Allows the wrist free movement into the intake
-        list.add(new ArmPositions(0, 830, 0.70, false)); // Prepare to pick it up; move wrist to go directly down
+        list.add(new ArmPositions(0, 0, 0)); //Starting pos.
+        list.add(new ArmPositions(200, 0, 0)); // Allows the wrist free movement into the intake
+        list.add(new ArmPositions(100, 0, 0)); // Prepare to pick it up; move wrist to go directly down
     }
 
     public static void BuildReadyPickupToPickup(List<ArmPositions> list)
     {
-        list.add(new ArmPositions(0,-256,.70,false)); // Lower arm/wrist into pixel holes
-        list.add(new ArmPositions(0,-256,.70,true)); // Grab pixels
+        list.add(new ArmPositions(300,0,0)); // Lower arm/wrist into pixel holes
+        list.add(new ArmPositions(100,0,0)); // Grab pixels
     }
 
     public static void BuildPickupToPrepareToPlace(List<ArmPositions> list)
     {
-        list.add(new ArmPositions(0,300,.70,true)); // move arm to allow for pixel adjustment
-        list.add(new ArmPositions(0,300,.78,true)); // pixel adjustment to take out of intake
-        list.add(new ArmPositions(0, 2060 /*2760*/ , 0.78, true)); // Raise the arm out of intake with pixels
-        list.add(new ArmPositions(0, 2060 /*2760*/ , 0.23, true)); // Prepare to place the code.
+        list.add(new ArmPositions(200,0,0)); // move arm to allow for pixel adjustment
+        list.add(new ArmPositions(100,0,0)); // pixel adjustment to take out of intake
+        list.add(new ArmPositions(300, 0 /*2760*/ , 0)); // Raise the arm out of intake with pixels
+        list.add(new ArmPositions(0, 0 /*2760*/ , 0)); // Prepare to place the code.
     }
 
     public static void BuildPrepareToPlaceToReadyToPickup(List<ArmPositions> list)
     {
-        list.add(new ArmPositions(0,830,.70,false)); // ReadyToPickup position; Prepare to take more pixels
+        list.add(new ArmPositions(0,0,0)); // ReadyToPickup position; Prepare to take more pixels
     }
 }

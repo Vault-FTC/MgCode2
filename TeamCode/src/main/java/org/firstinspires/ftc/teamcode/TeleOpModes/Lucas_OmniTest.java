@@ -90,7 +90,7 @@ public class Lucas_OmniTest extends LinearOpMode {
         DroneLauncher droneLauncher = new DroneLauncher(hardwareMap, telemetry);
         Arm arm = new Arm(hardwareMap, telemetry);
         Intake intake = new Intake(hardwareMap, telemetry);
-        LinearSlide linearSlide = new LinearSlide(hardwareMap);
+        LinearSlide linearSlide = new LinearSlide(hardwareMap, telemetry);
         LinkedList<ArmPositions> armTargets = new LinkedList<>();
         waitForStart();
         runtime.reset();
@@ -112,17 +112,7 @@ public class Lucas_OmniTest extends LinearOpMode {
             }
             intake.runIntake();
 
-            if (gamepad2.dpad_left) {
-                linearSlide.RunSlideMode(LinearSlideModes.SLIDE_UP);
-            } else if (gamepad2.dpad_right) {
-                linearSlide.RunSlideMode(LinearSlideModes.SLIDE_DOWN);
-            } else {
-                linearSlide.RunSlideMode(LinearSlideModes.SLIDE_OFF);
-            }
-            intake.runIntake();
-
-
-
+            linearSlide.doSlider(gamepad2, armTargets, runtime);
 
             if(gamepad2.dpad_down)
             {

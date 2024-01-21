@@ -20,13 +20,12 @@ public class Arm {
 
     private DcMotorEx weGoUpMotor = null;
     private Servo wristServo;
-    private Servo grabberServo;
-
     private DigitalChannel limitSwitch = null;
 
     double wristPosition = 0; //TODO : SET DEFAULT Position,
-    double grabberPosition = 0;
+    double sliderPosition = 0;
     double targetElbowPosition = 0; // TODO : Set default.
+    double targetSliderPosition = 0; // TODO : I think same as before
 
     ArmPositions targetPosition = null;
 
@@ -48,9 +47,6 @@ public class Arm {
         telemetry = tele;
         elbowMotor = hardwareMap.get(DcMotorEx.class, "arm_motor");
         wristServo = hardwareMap.get(Servo.class, "wrist");
-        grabberServo = hardwareMap.get(Servo.class, "grabber");
-        //weGoUpMotor = hardwareMap.get(DcMotorEx.class, "extend");
-        //wristServo.getController().pwmDisable();
 
         limitSwitch = hardwareMap.get(DigitalChannel.class, "arm_limit");
 
@@ -61,9 +57,7 @@ public class Arm {
         elbowMotor.setPower(1.0);
         elbowMotor.setPositionPIDFCoefficients(ARM_ELBOW_HIGH_SPEED);
         targetElbowPosition = elbowMotor.getCurrentPosition();
-        grabberServo.setPosition(0.5);
-        grabberPosition = 0.5;
-        //elbowMotor.setTargetPositionTolerance();
+        targetSliderPosition = weGoUpMotor.getCurrentPosition();
     }
 
     public void initializeArm(ElapsedTime runtime)
@@ -109,24 +103,13 @@ public class Arm {
     {
         wristPosition = armGoals.wristPosition;
         targetElbowPosition = armGoals.elbowPosition;
-        grabberPosition = armGoals.grabberPosition;
-        //armGoals.sliderPosition = armGoals.sliderPosition;
+        sliderPosition = armGoals.sliderPosition;
 
         elbowMotor.setPositionPIDFCoefficients(1.3);
     }
 
     public void moveArmByGamepad(Gamepad gamepad2)
     {
-        double grabberModifier = 0;
-        if(gamepad2.dpad_left)
-        {
-            grabberModifier = 0.002;
-        }
-        else if (gamepad2.dpad_right)
-        {
-            grabberModifier = -0.002;
-        }
-        grabberPosition = Math.min(1.0, Math.max(grabberPosition - (grabberModifier), 0));
         wristPosition = Math.min(1.0, Math.max(wristPosition - (0.006 * gamepad2.right_stick_y), 0));
         targetElbowPosition = Math.min(ARM_MAX_POSITION, Math.max(targetElbowPosition - (10 * gamepad2.left_stick_y), ARM_MIN_POSITION));
     }
@@ -135,11 +118,6 @@ public class Arm {
     {
         // WristPosition is a servo.  Servos have a range of 0.0-1.0.
 //        if(Math.abs(target.wristPosition - wristPosition) > 0.05)
-//        {
-//            return false;
-//        }
-//        // GrabberPosition is a servo.  Servos have a range of 0.0-1.0.
-//        if(Math.abs(target.grabberPosition - grabberServo.getPosition()) > 0.05)
 //        {
 //            return false;
 //        }
@@ -223,16 +201,13 @@ public class Arm {
         if(armTargets.size() > 0) {
             //telemetry.addData("Wrist :", "%4.2d, %4.2d", wristPosition, armTargets.get(0).wristPosition);
             //telemetry.addData("Elbow :", "%4.2d, %4.2d", elbowMotor.getCurrentPosition(), targetElbowPosition);
-            //telemetry.addData("Slider :", "%4.2f, %4.2f", weGoUpMotor.getCurrentPosition(), armTargets.get(0).sliderPosition);
         }
     }
 
     public void setMotors()
     {
-        grabberServo.setPosition(grabberPosition);
         elbowMotor.setTargetPosition((int)targetElbowPosition);
         wristServo.setPosition(wristPosition);
-        //weGoUpMotor.setPower(gamepad2.left_stick_y);
 
         telemetry.addData("Wrist", "%4.2f", wristPosition);
         telemetry.addData("Elbow Position", "%4.2f", targetElbowPosition);

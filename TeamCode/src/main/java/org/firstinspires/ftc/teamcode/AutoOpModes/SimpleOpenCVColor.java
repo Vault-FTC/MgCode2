@@ -108,7 +108,7 @@ public class SimpleOpenCVColor {
 //      Print true if  red-difference  > 130 and blue-difference < 130
         telemetry.addData("Detected Red?",Red);
 
-        telemetry.update();
+
 
     }
     public boolean getBlue() {return Blue;}
