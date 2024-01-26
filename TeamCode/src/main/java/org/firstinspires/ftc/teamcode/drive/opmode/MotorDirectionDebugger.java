@@ -28,7 +28,7 @@ import org.firstinspires.ftc.teamcode.drive.RobotMecanumDrive;
  *     ------------.-'   _  '-..+              Front of Bot
  *              /   _  ( Y )  _  \                  ^
  *             |  ( X )  _  ( B ) |     Front Left   \    Front Right
- *        ___  '.      ( A )     /|       Wheel       \      Wheel
+ *        ___  '.      ( A )     /|       Wheel       \      Wheel     \|
  *      .'    '.    '-._____.-'  .'       (x/▢)        \     (Y/Δ)
  *     |       |                 |                      \
  *      '.___.' '.               |          Rear Left    \   Rear Right

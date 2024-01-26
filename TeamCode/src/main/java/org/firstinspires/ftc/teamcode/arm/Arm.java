@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.LinearSlidw.LinearSlide;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,7 +19,6 @@ public class Arm {
 
     private DcMotorEx elbowMotor = null;
 
-    private DcMotorEx weGoUpMotor = null;
     private Servo wristServo;
     private DigitalChannel limitSwitch = null;
 
@@ -46,10 +46,12 @@ public class Arm {
     {
         telemetry = tele;
         elbowMotor = hardwareMap.get(DcMotorEx.class, "arm_motor");
-        wristServo = hardwareMap.get(Servo.class, "wrist");
 
         limitSwitch = hardwareMap.get(DigitalChannel.class, "arm_limit");
 
+        wristServo = hardwareMap.get(Servo.class, "wrist");
+        wristServo.setPosition(1.0);
+        wristPosition = 1.0;
         elbowMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         elbowMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elbowMotor.setTargetPosition(0);
@@ -57,7 +59,11 @@ public class Arm {
         elbowMotor.setPower(1.0);
         elbowMotor.setPositionPIDFCoefficients(ARM_ELBOW_HIGH_SPEED);
         targetElbowPosition = elbowMotor.getCurrentPosition();
-        targetSliderPosition = weGoUpMotor.getCurrentPosition();
+    }
+
+    public void initServo()
+    {
+
     }
 
     public void initializeArm(ElapsedTime runtime)
@@ -126,10 +132,10 @@ public class Arm {
         {
             return false;
         }
-//        if(Math.abs(target.sliderPosition - weGoUpMotor.getCurrentPosition()) > 0.10)
-//        {
-//            return false;
-//        }
+        if(Math.abs(target.sliderPosition - LinearSlide.WeGoUp.getCurrentPosition()) > 120)
+        {
+            return false;
+        }
         return true;
     }
 
@@ -161,18 +167,20 @@ public class Arm {
         return nextPhase;
     }
 
-    public void doArm(Gamepad gamepad2, LinkedList<ArmPositions> armTargets, ElapsedTime runtime)
+    public void doArm(Gamepad gamepad2, LinkedList<ArmPositions> armTargets, ElapsedTime runtime, LinearSlide slider)
     {
         telemetry.addData("Arm Limit : ", limitSwitch.getState());
 
         if(gamepad2.start)
         {
             armTargets.clear();
+            targetPosition = null;
         }
         if(armTargets.size() > 0 && targetPosition == null)
         {
             targetPosition = armTargets.getFirst();
             armTargets.removeFirst();
+            slider.MoveSliderToPosition(targetPosition, runtime);
             moveArmToPosition(targetPosition);
             lastNewTimer = runtime.seconds();
         }
@@ -184,10 +192,12 @@ public class Arm {
         else {
             hasReachedTarget = checkPosition(targetPosition);
             telemetry.addData("HasReachedTarget: ", hasReachedTarget);
+            telemetry.addData("Slider HasReachedTarget: ", targetPosition.sliderPosition - LinearSlide.WeGoUp.getCurrentPosition());
+            telemetry.addData("Slider Target Position", targetPosition.sliderPosition);
             telemetry.addData( "Target Pos Elbow: ", targetPosition.elbowPosition + "\nTarget Pos Wrist: " + wristPosition);
             telemetry.addData("LastNewTimer :", lastNewTimer);
             if (hasReachedTarget) {
-                if(runtime.seconds() - lastNewTimer > 2) {
+                if(runtime.seconds() - lastNewTimer > .5) {
                     targetPosition = null;
                     if(armTargets.size() == 0)
                     {

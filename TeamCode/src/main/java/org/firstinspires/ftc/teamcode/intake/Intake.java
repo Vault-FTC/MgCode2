@@ -38,7 +38,7 @@ public class Intake {
         intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         intakeMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(50, 0, 0.1,0));
         intakeMotor.setPower(1);
-        currentTargetPosition = INTAKE_COUNTS_PER_ROTATION / 3;
+        currentTargetPosition = INTAKE_COUNTS_PER_ROTATION / 4;
         intake_start = true;
         intakeMotor.setTargetPosition(currentTargetPosition);
     }

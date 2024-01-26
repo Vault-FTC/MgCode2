@@ -13,13 +13,14 @@ import java.util.LinkedList;
 
 
 public class LinearSlide {
-    private DcMotorEx WeGoUp = null;
+
+    static public DcMotorEx WeGoUp = null;
     private final double SLIDER_MIN_POSITION = -6000;
 
-    private final double SLIDER_MAX_POSITION = 3028;
+    private final double SLIDER_MAX_POSITION = 6000;
     Telemetry telemetry;
 
-    private final double LINEAR_SLIDE_SPEED = 3;
+    private final double LINEAR_SLIDE_SPEED = 12;
 
     private double targetSlidePosition = 0;
 
@@ -35,8 +36,7 @@ public class LinearSlide {
         WeGoUp.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         WeGoUp.setPower(1.0);
         WeGoUp.setPositionPIDFCoefficients(LINEAR_SLIDE_SPEED);
-        targetSlidePosition = WeGoUp.getCurrentPosition();
-
+        targetSlidePosition = 0;
     }
 
     public void RunSlideMode(LinearSlideModes slideModes) {
@@ -47,10 +47,10 @@ public class LinearSlide {
                 linearSlideMultiplier = 0;
                 break;
             case SLIDE_DOWN:
-                linearSlideMultiplier = -30;
+                linearSlideMultiplier = -10;
                 break;
             case SLIDE_UP:
-                linearSlideMultiplier = 30;
+                linearSlideMultiplier = 10;
                 break;
 
         }
@@ -58,8 +58,10 @@ public class LinearSlide {
         telemetry.addData("Slider Position", WeGoUp.getCurrentPosition());
     }
 
-    public void MoveSliderToPosition(ArmPositions positions)
+    public void MoveSliderToPosition(ArmPositions positions, ElapsedTime timer)
     {
+        lastNewTimer = timer.seconds();
+        targetPosition = positions;
         targetSlidePosition = positions.sliderPosition;
     }
 
@@ -76,14 +78,15 @@ public class LinearSlide {
         if(gamepad2.start)
         {
             armTargets.clear();
+            targetPosition = null;
         }
-        if(armTargets.size() > 0 && targetPosition == null)
-        {
-            targetPosition = armTargets.getFirst();
-            armTargets.removeFirst();
-            MoveSliderToPosition(targetPosition);
-            lastNewTimer = runtime.seconds();
-        }
+//        if(armTargets.size() > 0 && targetPosition == null)
+//        {
+//            targetPosition = armTargets.getFirst();
+//            //armTargets.removeFirst();
+//            MoveSliderToPosition(targetPosition);
+//            lastNewTimer = runtime.seconds();
+//        }
 
         boolean hasReachedTarget = false;
         if(targetPosition == null)
@@ -99,12 +102,13 @@ public class LinearSlide {
         else {
             hasReachedTarget = checkPosition(targetPosition);
             if (hasReachedTarget) {
-                if(runtime.seconds() - lastNewTimer > 2) {
+                if(runtime.seconds() - lastNewTimer > .5) {
                     targetPosition = null;
                 }
             }
         }
 
+        telemetry.addData("Slider Position", WeGoUp.getCurrentPosition());
         WeGoUp.setTargetPosition((int)targetSlidePosition);
     }
 }

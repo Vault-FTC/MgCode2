@@ -28,27 +28,34 @@ public class ArmPositions {
 
     public static void BuildArmStartupToReadyPickup(List<ArmPositions> list)
     {
-        list.add(new ArmPositions(0, 0, 0)); //Starting pos.
-        list.add(new ArmPositions(200, 0, 0)); // Allows the wrist free movement into the intake
-        list.add(new ArmPositions(100, 0, 0)); // Prepare to pick it up; move wrist to go directly down
+        list.add(new ArmPositions(0, 1200, 0));
+        list.add(new ArmPositions(0, 1200, .13)); // Allows the wrist free movement into the intake
+        list.add(new ArmPositions(0, 650, .13)); // Prepare to pick it up; move wrist to go directly down
+        list.add(new ArmPositions(0, 650, .22)); // Prepare to pick it up; move wrist to go directly down
+        list.add(new ArmPositions(0, 450, .22)); // Prepare to pick it up; move wrist to go directly down
+        list.add(new ArmPositions(0, 450, .31));
+        list.add(new ArmPositions(0, 130, .31));
+
     }
 
     public static void BuildReadyPickupToPickup(List<ArmPositions> list)
     {
-        list.add(new ArmPositions(300,0,0)); // Lower arm/wrist into pixel holes
-        list.add(new ArmPositions(100,0,0)); // Grab pixels
+        list.add(new ArmPositions(0, 140, .40));
+        list.add(new ArmPositions(4000, 140, .40));
+        list.add(new ArmPositions(4000, 140, .74));
+        list.add(new ArmPositions(20, 140, .74));
     }
 
     public static void BuildPickupToPrepareToPlace(List<ArmPositions> list)
     {
-        list.add(new ArmPositions(200,0,0)); // move arm to allow for pixel adjustment
-        list.add(new ArmPositions(100,0,0)); // pixel adjustment to take out of intake
-        list.add(new ArmPositions(300, 0 /*2760*/ , 0)); // Raise the arm out of intake with pixels
-        list.add(new ArmPositions(0, 0 /*2760*/ , 0)); // Prepare to place the code.
+        list.add(new ArmPositions(20,1300,.74)); // move arm to allow for pixel adjustment
+        list.add(new ArmPositions(20,1300,.40)); // pixel adjustment to take out of intake
+        list.add(new ArmPositions(20, 2750 , .40)); // Raise the arm out of intake with pixels
     }
 
     public static void BuildPrepareToPlaceToReadyToPickup(List<ArmPositions> list)
     {
-        list.add(new ArmPositions(0,0,0)); // ReadyToPickup position; Prepare to take more pixels
+        list.add(new ArmPositions(0,1200,0.25));
+        list.add(new ArmPositions(0,100,0.01)); // ReadyToPickup position; Prepare to take more pixels
     }
 }
