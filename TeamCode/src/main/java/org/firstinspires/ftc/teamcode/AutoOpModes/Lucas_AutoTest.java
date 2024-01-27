@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.AutoOpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -61,7 +62,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-
+@Disabled
 @Autonomous(name="Lucas Auto Test", group="Linear Auto")
 public class Lucas_AutoTest extends LinearOpMode {
 
@@ -184,7 +185,7 @@ public class Lucas_AutoTest extends LinearOpMode {
             //*/
 
             // ========== start to the pixel & board ==========
-            // unfineshed
+            // unfinished
             /*
             if(runtime.seconds() < 0.3) // 2'
             {

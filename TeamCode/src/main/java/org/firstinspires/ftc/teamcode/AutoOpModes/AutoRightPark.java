@@ -9,19 +9,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.RobotMecanumDrive;
 
-@Autonomous (name= "AutoLeftPark")
-public class AutoLeftPark extends LinearOpMode {
+@Autonomous (name= "AutoRightPark")
+public class AutoRightPark extends LinearOpMode {
     RobotMecanumDrive drive;
     ElapsedTime runtime = new ElapsedTime();
 
-
-    boolean hasRunMovement = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         drive = new RobotMecanumDrive(hardwareMap, telemetry);
-        drive.drive(false,0,0,0);
+        drive.drive(false, 0, 0, 0);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -36,17 +34,18 @@ public class AutoLeftPark extends LinearOpMode {
             double lateral = 0;
             double yaw = 0;
 
-            if (runtime.seconds() < 0.5) // 2'
+            if (runtime.seconds() < 0.2) // 2'
             {
-                drive.drive(false,1,0,0);
+                drive.drive(false, .5, 0, 0);
             } else if (runtime.seconds() < 0.6) {
-
-            } else if (runtime.seconds() < 1.5) {
-                drive.drive(false,0,1,0);
+                drive.drive(false,0,0,0);
+            } else if (runtime.seconds() < 1.7) {
+                drive.drive(false, 0, .8, 0);
+            } else{
+                drive.drive(false, 0,0,0);
             }
 
         }
-
     }
 }
 

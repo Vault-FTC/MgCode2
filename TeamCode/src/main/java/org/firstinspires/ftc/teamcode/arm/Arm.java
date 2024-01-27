@@ -156,11 +156,11 @@ public class Arm {
                 case ARM_PICKUP_TO_PREPARETOPLACE:
                     ArmPositions.BuildPickupToPrepareToPlace(armTargets);
                     elbowMotor.setPositionPIDFCoefficients(1.3);
-                    nextPhase = ArmPhases.ARM_PREPARETOPLACE_TO_READYPICKUP;
+                    nextPhase = ArmPhases.ARM_INITIALIZATION;
                     break;
                 case ARM_PREPARETOPLACE_TO_READYPICKUP:
                     ArmPositions.BuildPrepareToPlaceToReadyToPickup(armTargets);
-                    nextPhase = ArmPhases.ARM_READYPICKUP_TO_PICKUP;
+                    nextPhase = ArmPhases.ARM_INITIALIZATION;
                     break;
             }
         }
